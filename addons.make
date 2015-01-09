@@ -1,0 +1,12 @@
+ofxAndroid
+ofxAccelerometer
+ofxOsc
+ofxGui
+ofxUI
+ofxXmlSettings
+ofxHTTP
+ofxJSON
+ofxTaskQueue
+ofxSSLManager
+ofxMediaType
+ofxIO
