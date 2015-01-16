@@ -21,6 +21,7 @@ void ofApp::setup(){
 	IDmyChannelsCount = 50;//the first are for buttons
 	wantToSaveAutomix = false;
 	isTempChannelCreated = false;//for automix
+	wallSelected = -1;
 	
 	appWall = new Wall();
 	appWall->setup(pathToServer);
@@ -68,7 +69,8 @@ void ofApp::setup(){
 	//Buttons
 	//Channel display
 	GUIbuttons.push_back(new Button("back", 10, 25, ofGetHeight() - HEIGHT_BUTTONS*2 - 25, 1.0/2*2.0/5*ofGetWidth()-10, HEIGHT_BUTTONS , CHANNELDISPLAY_PAGE, "BACK", "BACK", 40));
-	GUIbuttons.push_back(new Button("play", 11, 25+1.0/2*2.0/5*ofGetWidth(), ofGetHeight() - HEIGHT_BUTTONS*2 - 25, 1.0/2*2.0/5*ofGetWidth()-10, HEIGHT_BUTTONS , CHANNELDISPLAY_PAGE, "PAUSE", "PLAY", 40));
+	GUIbuttons.push_back(new Button("play", 11,ofGetWidth()-25-(1.0/2*2.0/5*ofGetWidth()-10), ofGetHeight() - HEIGHT_BUTTONS*2 - 25, 1.0/2*2.0/5*ofGetWidth()-10, HEIGHT_BUTTONS, CHANNELDISPLAY_PAGE, "PAUSE", "PLAY", 40));
+	GUIbuttons.push_back(new Button("preview", 17, 25+1.0/2*2.0/5*ofGetWidth(), ofGetHeight() - HEIGHT_BUTTONS*2 - 25, 1.0/2*2.0/5*ofGetWidth()-10, HEIGHT_BUTTONS , CHANNELDISPLAY_PAGE, "PREVIEW", "PREVIEW", 40));
 	
 	//Automix
 	GUIbuttons.push_back(new Button("preview", 12, 25, ofGetHeight() - HEIGHT_BUTTONS*2 - 25, 1.0/2*2.0/5*ofGetWidth()-10, HEIGHT_BUTTONS , AUTOMIX_PAGE, "PREVIEW", "PREVIEW", 40));
@@ -323,6 +325,10 @@ void ofApp::update() {
     		case 16: //back automix
     			wantToSaveAutomix = false;
     			break;
+	        case 17:
+		  //preview channel
+		  appWall->updatePreview(channelSelected->imagesUrl, wallSelected, pathToServer);
+		  break;
     	}
     	//channels display buttons
     	if ((buttonNumber >=20 && buttonNumber <=40) || (buttonNumber >=50) ) {
@@ -468,7 +474,7 @@ void ofApp::draw() {
     	case AUTOMIX_PAGE:
     		if (!wantToSaveAutomix){
 	    		tempChannel->drawAutomixCreation(/*appMenu->automixTextInput->getTextString()*/);
-	    		for (int i = 2; i < 6; i++){
+	    		for (int i = 3; i < 7; i++){
 	    			GUIbuttons[i]->draw();
 	    		}
 	    	} else {
@@ -487,9 +493,18 @@ void ofApp::draw() {
     		break;
     		
     	case CHANNELDISPLAY_PAGE:
-    		channelSelected->drawPage();
-    		GUIbuttons[0]->draw();
-    		GUIbuttons[1]->draw();
+	  if (GUIbuttons[2]->getIsActiv() && wallSelected !=-1){
+	    appWall->drawPreview();
+	    GUIbuttons[2]->draw();
+	    channelSelected->guiDescription->setVisible(false);
+	  } else {
+	    channelSelected->drawPage();
+	    GUIbuttons[0]->draw();
+	    GUIbuttons[1]->draw();
+	    GUIbuttons[2]->draw();
+	    GUIbuttons[2]->setIsActiv(false);
+	    channelSelected->guiDescription->setVisible(true);
+	  }
     		break;
     		
     }
@@ -624,13 +639,13 @@ void ofApp::mouseReleased(int x, int y, int button){
 		
 		//Rend inactif tous les boutons autre que le nouvel actif
 		//TODO: plus d'actualité
-		/*if (isButtonActioned){
+		if (isButtonActioned){
 			for(size_t i=0; i < GUIbuttons.size(); i++){
 				if (buttonNumber != GUIbuttons[i]->getID()){
 					GUIbuttons[i]->setIsActiv(false);
 				}
 			}
-		}*/
+		}
 	
 		if (!appMenu->wallList->isOpen() && !appMenu->automixTextInput->isClicked() && !appMenu->searchTextInput->isClicked()){//bloque les boutons si menu déroulant du menu ouvert ou bouton automix activé
 			if (pageLevel == HOME_PAGE || pageLevel == CHANNELSELECT_PAGE){//vérifie le clic sur un channel
@@ -675,6 +690,7 @@ void ofApp::touchDoubleTap(int x, int y, int id){
 //--------------------------------------------------------------
 
 void ofApp::keyPressed(int key){
+  //  ofLogNotice() << "keypressed main app";
 	switch(key){
 		case 10://return
 			buttonNumber = AUTOMIX_PAGE;

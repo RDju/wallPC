@@ -24,6 +24,7 @@ class Module{
 		int typeSize;//13, 24 ou 27
 		int typeMat; // screen, LED, screen LED, texture
 		int ID;
+		ofPlanePrimitive plane;
 		ofPoint pos;//absolute pos
 		ofPoint locationInGrid;//pos in grid
 		ofPoint size;//depending on typeSize
@@ -85,6 +86,10 @@ class Module{
 				color = ofColor(184, 148, 193);
 				break;
 		}
+
+		plane.set(size.x, size.y);
+		plane.setPosition(pos.x, pos.y, 0);
+		plane.setResolution(100, 100);
 		
 	}
 	
@@ -238,7 +243,12 @@ class Module{
 	ofPoint getPos(){
 		return pos;
 	}
-	
+	ofPoint getSize(){
+	  return size;
+	}
+	ofPlanePrimitive getPlane(){
+	  return plane;
+	}
 	ofPoint getPosInGrid(){
 		ofPoint tempPoint;
 		
@@ -247,6 +257,6 @@ class Module{
 		
 		return tempPoint;
 	}
-
+	
 
 };

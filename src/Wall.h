@@ -13,6 +13,7 @@ public:
 	ofRectangle gridLines[30];//Contient les coordonnées de chaque ligne de la grille (en relatif par rapport au xy de gridSize)
 	vector<int> touchOrder; //classe les modules par ordre de dernier touché
 	vector<ofPoint> splitableModules;//liste de couples de modules splitables
+	vector<ofImage*> previewImages;
 	int gridRepresentation[7][7];//not used
 	int IDbutton = 0;
 	
@@ -26,14 +27,16 @@ public:
 	vector<Module*> modules;
 	vector<Module*> libraryModules;
 	vector<Button*> wallButtons;
-	
+	int modulesNumber;
 	ofxUICanvas *saveWallGUI;
 	ofxUITextInput *saveWallTextInput;
 	
 	ofxXmlSettings modSettings;
 
-    string xmlStructure;
+	string xmlStructure;
 	int lastTagNumber;
+
+        string link2images;
 	
 	bool drawMedia;//not used --> for preview ?
 	
@@ -43,6 +46,7 @@ public:
 	
 	void setup(string pathToServer){
 		IDmodulesCount = 0;
+		modulesNumber = -1;
 		isLibraryOpened = false;
 		newWallCreated = false;
 		
@@ -168,6 +172,37 @@ public:
 			newWallCreated = true;
 		} 
 	}
+
+	void updatePreview(string path2images, int wallSelected, string pathToServer){
+	  
+	  XML2Wall(wallSelected, pathToServer);
+	  //getModulesNumber(wallSelected);
+	  if (wallSelected != -1){
+	    previewImages.clear();
+	    for (int i=0; i<modulesNumber; i++){
+	      previewImages.push_back(new ofImage());
+	      previewImages[i]->loadImage(path2images + ofToString(i+1)+ ".jpg");
+	      //previewImages[i]->resize(modules[i]->getSize().x);//, modules[i]->getSize().y);
+	      //modules[i]->getPlane().setPosition(modules[i]->getPos().x, modules[i]->getPos().y, 0);
+	      cropImage(i);
+	    }
+	  }
+	  
+	}
+
+	void cropImage(int i){
+
+	    if ((float)previewImages[i]->getWidth() / modules[i]->getSize().x > (float)previewImages[i]->getHeight() / modules[i]->getSize().y){
+	      previewImages[i]->resize((float) previewImages[i]->getWidth() *   modules[i]->getSize().y / previewImages[i]->getHeight() , modules[i]->getSize().y);
+	      int cropX = (float) previewImages[i]->getWidth() *   modules[i]->getSize().y / previewImages[i]->getHeight() - modules[i]->getSize().x;
+	      previewImages[i]->crop(cropX/2, 0, modules[i]->getSize().x, modules[i]->getSize().y);
+	      
+	    } else {
+	      previewImages[i]->resize(modules[i]->getSize().x, (float) previewImages[i]->getHeight() * modules[i]->getSize().x / previewImages[i]->getWidth());
+	      int cropY = (float) previewImages[i]->getHeight() * modules[i]->getSize().x / previewImages[i]->getWidth() - modules[i]->getSize().y;
+	      previewImages[i]->crop(0, cropY/2, modules[i]->getSize().x, modules[i]->getSize().y);
+	    }
+	}
 	
 	void draw(){
     		
@@ -177,6 +212,29 @@ public:
 			wallButtons[i]->draw();
 		for (size_t i = 0; i<modules.size();i++)
     		modules[touchOrder[i]]->draw();
+	}
+
+	void drawPreview(){
+	  for (int i=0; i<modulesNumber; i++){
+	    if (modules[i]->getTypeMat() == 0 || modules[i]->getTypeMat() == 2) {
+	      previewImages[i]->draw(modules[i]->getPos().x, modules[i]->getPos().y);
+	      
+	    } else {
+	      modules[i]->draw();
+	    }
+
+	    ofPushStyle();
+	      ofSetColor(0);
+	      ofNoFill();
+	      ofSetLineWidth(5);
+	      ofRect(modules[i]->getPos().x, modules[i]->getPos().y, modules[i]->getSize().x, modules[i]->getSize().y);
+		ofPopStyle();
+	      
+	      /*previewImages[i]->getTextureReference().bind();
+	    modules[i]->getPlane().draw();
+	    previewImages[i]->getTextureReference().unbind();*/
+	    
+	  }
 	}
 	
 	void drawLibrary(){
@@ -436,8 +494,8 @@ public:
 	    for (int i = 0; i < numTagsWALL; i++){
 	    	modSettings.pushTag("WALL", i);
 	    	if (modSettings.getValue("ID", i) == wallID){ //Si c'est le wall qu'on veut
-		    		int numTagsMODULES = modSettings.getNumTags("MODULES");
-		    		for (int j = 0; j < numTagsMODULES; j++){
+		    		modulesNumber = modSettings.getNumTags("MODULES");
+		    		for (int j = 0; j < modulesNumber; j++){
 		    			modSettings.pushTag("MODULES", j);
 		    			
 		    				int tmpSize;
@@ -459,27 +517,41 @@ public:
 			        		modules.push_back(new Module(tmpSize, tmpType, tmpID));
 		    				modules[j]->setPos(tmpPos.x, tmpPos.y);
 		    				touchOrder.push_back(j);
-		        			
+						
 		    			modSettings.popTag();//modules
 		    		}
 	    	}
 	    	modSettings.popTag();//wall
 	    }
 	}
+
+	int getModulesNumber(int selectedWall){
+
+
+	  if (selectedWall != -1){
+	    modSettings.load("wallspc.xml");
+	    modSettings.pushTag("WALL", selectedWall);
+	    modulesNumber = modSettings.getNumTags("MODULES");
+	    modSettings.popTag();
+
+	    return modulesNumber;
+	  }
+	  return -1; 
+	}
 	
 	//fill names depending on a xml file and end with "create a wall"
 	void getWallListName(){
 		
-		modSettings.load("wallspc.xml");
+	  modSettings.load("wallspc.xml");
 		
-		names.clear();
-		int numTagsWALL = modSettings.getNumTags("WALL");
-	    for (int i = 0; i < numTagsWALL; i++){
-	    	modSettings.pushTag("WALL", i);
-	    		names.push_back((string)modSettings.getValue("NAME", ""));
-	    	modSettings.popTag();
-	    }
-	    names.push_back("CREATE A NEW WALL");
+	  names.clear();
+	  int numTagsWALL = modSettings.getNumTags("WALL");
+	  for (int i = 0; i < numTagsWALL; i++){
+	    modSettings.pushTag("WALL", i);
+	    names.push_back((string)modSettings.getValue("NAME", ""));
+	    modSettings.popTag();
+	  }
+	  names.push_back("CREATE A NEW WALL");
 	}
 	    
 	//-------------------

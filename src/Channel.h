@@ -20,6 +20,7 @@ class Channel{
 		string price;
 		string description;
 		string imageUrl;
+		string imagesUrl;
 		vector<string> tags;//not used
 		string tagsString;
 		int ID;
@@ -219,8 +220,8 @@ class Channel{
 		
 		void xml2channel(string path){
 			
-			//save the distant xml file in a temp local file
-			ofFile tempXML;
+		    //save the distant xml file in a temp local file
+		    ofFile tempXML;
 		    ofBuffer dataBuffer;
 		    
 		    tempXML.open(ofToDataPath("temp.xml"), ofFile::ReadWrite, false);
@@ -235,6 +236,7 @@ class Channel{
 				    creator = modSettings.getValue("by", "error");
 				    price = modSettings.getValue("price", "error");
 					imageUrl = "http://192.168.1.13:8000/wallChannels/"+modSettings.getValue("playfolder", "error")+"/image/1.jpg";
+					imagesUrl = "http://192.168.1.13:8000/wallChannels/"+modSettings.getValue("playfolder", "error")+"/image/";
 					description = modSettings.getValue("blurb", "error");
 					tagsString = modSettings.getValue("keyword", "error");
 					title = modSettings.getValue("title", "error");
