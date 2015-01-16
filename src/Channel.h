@@ -224,27 +224,28 @@ class Channel{
 		    ofFile tempXML;
 		    ofBuffer dataBuffer;
 		    
-		    tempXML.open(ofToDataPath("temp.xml"), ofFile::ReadWrite, false);
+		    /*tempXML.open(ofToDataPath("temp.xml"), ofFile::ReadWrite, false);
 		    dataBuffer = ofLoadURL(path).data;
-		    ofBufferToFile("temp.xml", dataBuffer);
+		    ofBufferToFile("temp.xml", dataBuffer);*/
 		    
 		    //load the local xml file
-		    modSettings.load("temp.xml");
+		    modSettings.load(path);//"temp.xml");
 		    tempXML.remove();
 		    
 		    modSettings.pushTag("channel");
-				    creator = modSettings.getValue("by", "error");
-				    price = modSettings.getValue("price", "error");
-					imageUrl = "http://192.168.1.13:8000/wallChannels/"+modSettings.getValue("playfolder", "error")+"/image/1.jpg";
-					imagesUrl = "http://192.168.1.13:8000/wallChannels/"+modSettings.getValue("playfolder", "error")+"/image/";
-					description = modSettings.getValue("blurb", "error");
-					tagsString = modSettings.getValue("keyword", "error");
-					title = modSettings.getValue("title", "error");
-			
-			channelImage.loadImage(imageUrl);
-			channelImage.resize(CHANNEL_IMAGE_WIDTH, CHANNEL_IMAGE_HEIGHT);
-			previewImage.loadImage(imageUrl);
-			previewImage.resize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT);
+		    creator = modSettings.getValue("by", "error");
+		    price = modSettings.getValue("price", "error");
+		    imageUrl = ofToDataPath("wallChannels/"+modSettings.getValue("playfolder", "error")+"/image/1.jpg");
+		    ofLogNotice("ici") << imageUrl;
+		    imagesUrl = /*"http://192.168.1.13:8000*/ofToDataPath("wallChannels/"+modSettings.getValue("playfolder", "error")+"/image/");
+		    description = modSettings.getValue("blurb", "error");
+		    tagsString = modSettings.getValue("keyword", "error");
+		    title = modSettings.getValue("title", "error");
+		    
+		    channelImage.loadImage(imageUrl);
+		    channelImage.resize(CHANNEL_IMAGE_WIDTH, CHANNEL_IMAGE_HEIGHT);
+		    previewImage.loadImage(imageUrl);
+		    previewImage.resize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT);
 		}
 		
 		//temporarly save localy the channel from automix (don't survive a reboot)

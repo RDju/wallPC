@@ -114,7 +114,7 @@ private:
 	//IP of each wall server (only one wall working for the moment)
 	string hosts[2] = {"192.168.1.13", "192.168.1.182"};
 	
-	string pathToServer = "http://" + hosts[0] + ":" + ofToString(HTTPPORT) + "/";
+	string pathToServer = ofToDataPath("");//"http://" + hosts[0] + ":" + ofToString(HTTPPORT) + "/";
 	
 	//XML TODO:use it
 	string wallURL = pathToServer + "wall.xml";

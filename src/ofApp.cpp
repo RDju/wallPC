@@ -5,7 +5,9 @@ using namespace std;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+  
 
+  ofLogNotice("path") << ofToDataPath("lol");
 	//init graphics
 	//background.loadImage("bckgrimgWhite.png");
 	ofEnableAlphaBlending();
@@ -130,18 +132,18 @@ void ofApp::loadChannelXml(){
 			ofFile tempXML;
 		    ofBuffer dataBuffer;
 		    
-		    tempXML.open(ofToDataPath("temp.xml"), ofFile::ReadWrite, false);
+		    /*tempXML.open(ofToDataPath("temp.xml"), ofFile::ReadWrite, false);
 		    dataBuffer = ofLoadURL(pathToServer + "wallChannels/channels.xml").data;
-		    ofBufferToFile("temp.xml", dataBuffer);
+		    ofBufferToFile("temp.xml", dataBuffer);*/
 		    
-		    modSettings.load("temp.xml");
+		    modSettings.load(ofToDataPath("wallChannels/channels.xml"));//"temp.xml");
 		    tempXML.remove();
 		    
 		    modSettings.pushTag("channels");
 		    demoChannelNumber =  modSettings.getNumTags("channel");
 		    for (int i = 0; i < demoChannelNumber; i++) {
 		    	demoChannels.push_back(new Channel(i, pathToServer + modSettings.getValue("channel", "error", i)));
-				demoChannels[i]->playButton->setID(IDbuttonsCount++);
+			demoChannels[i]->playButton->setID(IDbuttonsCount++);
 		    }
 		    modSettings.popTag();
 }

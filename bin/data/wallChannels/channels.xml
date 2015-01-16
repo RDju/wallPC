@@ -1,0 +1,9 @@
+<channels>
+  <channel>wallChannels/geo.xml</channel>
+  <channel>wallChannels/southerngothic.xml</channel>
+  <channel>wallChannels/lefigaro.xml</channel>
+  <channel>wallChannels/west.xml</channel>
+  <channel>wallChannels/cinemagraph.xml</channel>
+  <channel>wallChannels/rca.xml</channel>
+</channels>
+      

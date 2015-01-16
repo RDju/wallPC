@@ -65,15 +65,16 @@ public:
 				libraryModules.push_back(new Module(j, i, -1));
 				
 		//on part d'une base de walls
-	    ofFile tempXML;
-	    ofBuffer dataBuffer; 
-	    
-	    tempXML.open(ofToDataPath("wallspc.xml"), ofFile::ReadWrite, false);
-	    tempXML.clear();
-	    dataBuffer = ofLoadURL(pathToServer + "wallspc.xml").data;
-	    ofBufferToFile("wallspc.xml", dataBuffer);
-	    tempXML.close();
+		ofFile tempXML, tempXML2;
+		ofBuffer dataBuffer; 
 		
+		tempXML.open(ofToDataPath("walls.xml"), ofFile::ReadWrite, false);
+		tempXML.clear();
+		tempXML2.open(ofToDataPath("wallspc.xml"), ofFile::ReadWrite, false);
+		dataBuffer = tempXML2.readToBuffer();//ofLoadURL(pathToServer + "wallspc.xml").data;
+		ofBufferToFile("walls.xml", dataBuffer);
+		tempXML.close();
+		tempXML2.close();
 		//fill the walls names depending on a xml file
 		getWallListName();
 				
@@ -360,7 +361,7 @@ public:
 	
 	//---------------WORK IN PROGRESS : save several walls -----------------------//
 		bool wallFound = false;
-		if (modSettings.load("wallspc.xml")){ //si le fichier existe
+		if (modSettings.load("walls.xml")){ //si le fichier existe
 			int numTagsWALL = modSettings.getNumTags("WALL");
 			for (int i = 0; i < numTagsWALL; i++){
 	    		modSettings.pushTag("WALL", i);
@@ -415,7 +416,7 @@ public:
 	    		modSettings.popTag();//("WALL")
 	    	}		
 		} else {//walls.xml n'existe pas
-			ofFile newFile(ofToDataPath("wallspc.xml"), ofFile::ReadWrite);
+			ofFile newFile(ofToDataPath("walls.xml"), ofFile::ReadWrite);
 			newFile.create();
 		}
 		
@@ -460,7 +461,7 @@ public:
 		    }
 		    modSettings.popTag();
 		}
-		modSettings.save("wallspc.xml");
+		modSettings.save("walls.xml");
 		
 		/*ofFile tempFile;
 		tempFile.open("walls.xml", ofFile::ReadWrite, false);
@@ -487,7 +488,7 @@ public:
 	    tempXML.remove();*/
 	    
 	    //Fichier externe copié localement à l'initialisation
-	    modSettings.load("wallspc.xml");
+	    modSettings.load("walls.xml");
 		
 	    int numTagsWALL = modSettings.getNumTags("WALL");
 	    
@@ -529,7 +530,7 @@ public:
 
 
 	  if (selectedWall != -1){
-	    modSettings.load("wallspc.xml");
+	    modSettings.load("walls.xml");
 	    modSettings.pushTag("WALL", selectedWall);
 	    modulesNumber = modSettings.getNumTags("MODULES");
 	    modSettings.popTag();
@@ -542,7 +543,7 @@ public:
 	//fill names depending on a xml file and end with "create a wall"
 	void getWallListName(){
 		
-	  modSettings.load("wallspc.xml");
+	  modSettings.load("walls.xml");
 		
 	  names.clear();
 	  int numTagsWALL = modSettings.getNumTags("WALL");
